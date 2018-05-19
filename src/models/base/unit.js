@@ -18,9 +18,27 @@ export default class Unit {
 
     this.baseHealth = _baseHealth;
     this.recharge = _recharge;
+    this.active = this.baseHealth > 0;
   }
 
-  getBaseHealth = () => (this.baseHealth);
+  getHealth = () => (this.baseHealth);
 
   getRecharge = () => (this.recharge);
+
+  getNewtAttackSuccessProbability = () => (0);
+
+  getNextAttackDamage = () => (0);
+
+  recieveDamage = (dmg) => {
+    this.baseHealth -= dmg;
+    if (this.baseHealth <= 0) {
+      this.destoryUnit();
+    }
+  };
+
+  destoryUnit = () => {
+    this.baseHealth = 0;
+    this.recharge = 0;
+    this.active = false;
+  }
 }
