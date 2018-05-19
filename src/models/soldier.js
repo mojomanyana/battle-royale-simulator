@@ -1,7 +1,7 @@
 import assert from 'assert';
-import BaseUnit from './base/baseUnit';
+import Unit from './base/unit';
 
-export default class Soldier extends BaseUnit {
+export default class Soldier extends Unit {
   constructor(_health, _recharge, _soldierExperience) {
     super(_health, _recharge);
 

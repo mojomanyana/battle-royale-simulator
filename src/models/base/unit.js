@@ -1,9 +1,9 @@
 import assert from 'assert';
 
-export default class BaseUnit {
+export default class Unit {
   constructor(_baseHealth, _recharge) {
-    if (new.target === BaseUnit) {
-      throw new TypeError('Cannot construct BaseUnit instances directly');
+    if (new.target === Unit) {
+      throw new TypeError('Cannot construct Unit instances directly');
     }
 
     assert(_baseHealth);

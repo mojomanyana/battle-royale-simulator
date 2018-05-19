@@ -1,8 +1,8 @@
 import assert from 'assert';
 import gmean from 'compute-gmean';
-import BaseUnit from './base/baseUnit';
+import Unit from './base/unit';
 
-export default class Vehicles extends BaseUnit {
+export default class Vehicles extends Unit {
   constructor(_health, _recharge, _operator1, _operator2 = null, _operator3 = null) {
     super(_health, _recharge);
 
@@ -42,7 +42,7 @@ export default class Vehicles extends BaseUnit {
 
   getNextAttackDamage = () => {
     const opExperiances = this.operators.map(operator => operator.getExperience() / 100);
-    const dmg = 0.1 + opExperiances.reduce((a,b) => (a + b));
+    const dmg = 0.1 + opExperiances.reduce((a, b) => (a + b));
     console.log(`Vehicles next attack damage is ${dmg}`);
     return dmg;
   }
