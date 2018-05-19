@@ -11,7 +11,8 @@
     "import/parser": "babel-eslint"
   },
   "rules": {
-    "no-plusplus": 0
+    "no-plusplus": 0,
+    "no-mixed-operators": 0
   },
   "globals": {
     "it": true,
