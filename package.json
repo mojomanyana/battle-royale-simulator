@@ -37,6 +37,8 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
-    "compute-gmean": "^1.1.0"
+    "compute-gmean": "^1.1.0",
+    "random-word": "^2.0.0",
+    "readline-promise": "^1.0.3"
   }
 }

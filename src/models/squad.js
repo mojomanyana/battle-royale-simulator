@@ -1,5 +1,6 @@
 import assert from 'assert';
 import gmean from 'compute-gmean';
+import randomWord from 'random-word';
 import Unit from './base/unit';
 
 export default class Squad {
@@ -21,21 +22,20 @@ export default class Squad {
       throw new TypeError('A strategy must be string type of value: "random", "weakest" or "strongest"');
     }
     this.strategy = _strategy;
-
-    console.log(`\x1b[35m*** Squad created { nou:${this.units.length} } ***\x1b[39m`);
+    this.name = randomWord();
   }
 
   getNewtAttackSuccessProbability = () => {
     const opAttacks = this.units.map(unit => unit.getNewtAttackSuccessProbability());
     const prob = gmean(opAttacks);
-    console.log(`\x1b[35m*** Squad next attack success probability is ${prob} ***\x1b[39m`);
+    console.log(`\x1b[35m*** Squad(${this.name}) next attack success probability is ${prob} ***\x1b[39m`);
     return prob;
   }
 
   getNextAttackDamage = () => {
     const opDmg = this.units.map(unit => unit.getNextAttackDamage());
     const dmg = opDmg.reduce((a, b) => (a + b));
-    console.log(`\x1b[35m*** Squad next attack damage is ${dmg} ***\x1b[39m`);
+    console.log(`\x1b[35m*** Squad(${this.name}) next attack damage is ${dmg} ***\x1b[39m`);
     return dmg;
   }
 
@@ -45,4 +45,6 @@ export default class Squad {
       unit.recieveDamage(dmg / numberOfUnits);
     });
   }
+
+  toString = (pref = '\n\x1b[35m-') => (`${pref}Squad(${this.name}) { nou:${this.units.length} }${this.units.map(operator => (operator.toString()))}\x1b[39m`);
 }

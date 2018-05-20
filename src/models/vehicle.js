@@ -29,7 +29,6 @@ export default class Vehicles extends Unit {
       }
       this.operators.push(_operator3);
     }
-    console.log(`\x1b[34m*** Vehicle unit created { h:${this.getHealth()}, r:${this.getRecharge()}, noo:${this.getNumberOfOperators()} } ***\x1b[39m`);
   }
 
   getNumberOfOperators = () => (this.operators.length);
@@ -45,14 +44,14 @@ export default class Vehicles extends Unit {
     const prob =
       0.5 * (1 + this.getHealth() / 100)
       * gmean(opAttacks);
-    console.log(`\x1b[34m*** Vehicles next attack success probability is ${prob} ***\x1b[39m`);
+    console.log(`\x1b[34m*** Vehicles(${this.name}) next attack success probability is ${prob} ***\x1b[39m`);
     return prob;
   }
 
   getNextAttackDamage = () => {
     const opExperiances = this.operators.map(operator => operator.getExperience() / 100);
     const dmg = 0.1 + opExperiances.reduce((a, b) => (a + b));
-    console.log(`\x1b[34m*** Vehicles next attack damage is ${dmg} ***\x1b[39m`);
+    console.log(`\x1b[34m*** Vehicles(${this.name}) next attack damage is ${dmg} ***\x1b[39m`);
     return dmg;
   }
 
@@ -79,4 +78,6 @@ export default class Vehicles extends Unit {
     this.operators.forEach(operator => operator.destoryUnit());
     super.destroyUnit();
   }
+
+  toString = (pref = '\n\x1b[34m--') => (`${pref}Vehicle(${this.name}) { h:${this.getHealth()}, r:${this.getRecharge()} }${this.operators.map(operator => (operator.toString(`${pref}-`)))}\x1b[39m`);
 }

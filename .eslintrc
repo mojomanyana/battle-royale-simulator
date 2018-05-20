@@ -12,6 +12,8 @@
   },
   "rules": {
     "no-console": 0,
+    "no-plusplus": 0,
+    "no-loop-func": 0,
     "no-mixed-operators": 0
   },
   "globals": {

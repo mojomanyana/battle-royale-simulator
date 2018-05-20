@@ -1,4 +1,5 @@
 import assert from 'assert';
+import randomWord from 'random-word';
 
 export default class Unit {
   constructor(_baseHealth, _recharge) {
@@ -16,12 +17,14 @@ export default class Unit {
       throw new TypeError('A unit recharge must be 100 - 2000');
     }
 
+    this.name = randomWord();
     this.baseHealth = _baseHealth;
     this.recharge = _recharge;
-    this.active = this.baseHealth > 0;
   }
 
   getHealth = () => (this.baseHealth);
+
+  toString = (pref = '\x1b[39m') => (`${pref}Unit`);
 
   getRecharge = () => (this.recharge);
 
@@ -39,6 +42,7 @@ export default class Unit {
   destoryUnit = () => {
     this.baseHealth = 0;
     this.recharge = 0;
-    this.active = false;
   }
+
+  isActive = () => (this.baseHealth > 0);
 }

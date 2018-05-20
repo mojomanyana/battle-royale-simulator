@@ -1,23 +1,94 @@
+import readline from 'readline-promise';
+import randomWord from 'random-word';
 import Soldier from './models/soldier';
 import Vehicle from './models/vehicle';
 import Squad from './models/squad';
 
-const test = (a, b) => (a + b);
+const rlp = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: true,
+});
 
-console.log('10 + 20', test(10, 20));
-console.log('10 + 30', test(10, 30));
+const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-const sol1 = new Soldier(50, 200, 1);
-const sol2 = new Soldier(90, 200, 0);
-const sol3 = new Soldier(90, 200, 20);
-const sol4 = new Soldier(20, 1200, 1);
-const sol5 = new Soldier(20, 1800, 1);
-const sol6 = new Soldier(88, 1000, 1);
-const sol7 = new Soldier(78, 500, 10);
-const sol8 = new Soldier(66, 300, 30);
-const veh1 = new Vehicle(90, 1200, sol1, sol2);
-const veh2 = new Vehicle(30, 2000, sol6, sol7, sol8);
-const sqa1 = new Squad('random', sol3, sol4, sol5, veh1, veh2);
+const createRandomSolder = () => (new Soldier(rnd(1, 100), rnd(100, 2000), rnd(1, 50)));
 
-sqa1.getNewtAttackSuccessProbability();
-sqa1.getNextAttackDamage();
+const createRandomVehicle = (...solders) => (new Vehicle(rnd(1, 100), rnd(1000, 2000), ...solders));
+
+const createRandomUnit = () => {
+  if (Math.random() > 0.5) {
+    // Return Solder
+    return createRandomSolder();
+  }
+  // Return Vehicle
+  const numOfOperators = rnd(1, 3);
+  const operators = [];
+  for (let i = 0; i < numOfOperators; i++) {
+    operators.push(createRandomSolder());
+  }
+  return createRandomVehicle(...operators);
+};
+
+const createRandomSquad = (numberOfUnits, strategy) => {
+  const units = [];
+  for (let i = 0; i < numberOfUnits; i++) {
+    units.push(createRandomUnit());
+  }
+  return new Squad(strategy, ...units);
+};
+
+const init = (callback) => {
+  const armies = [];
+  let numberOfArmies;
+  let strategy;
+  let squadsNumber;
+  let unitsPerSquadNumber;
+  rlp.questionAsync('Enter number of armies on battlefield (Please enter number >= 2)? ')
+    .then((numberOfArmiesAnswer) => {
+      numberOfArmies = numberOfArmiesAnswer;
+      for (let i = 0, p = Promise.resolve(); i < numberOfArmies + 1; i++) {
+        p = p.then(() => new Promise((resolve, reject) => {
+          const armyName = randomWord();
+          console.log(`\n\n\n\n*** Initializing Army(${armyName}) ***\n\n`);
+          rlp.questionAsync(`Enter Army(${armyName}) attack strategy ("random", "weakest", "strongest")? `)
+            .then((answerStrategy) => {
+              strategy = answerStrategy;
+              return rlp.questionAsync(`Enter Army(${armyName}) number of sqads (Please enter number >= 2)? `);
+            })
+            .then((answerSqadsNumber) => {
+              squadsNumber = answerSqadsNumber;
+              return rlp.questionAsync(`Enter Army(${armyName}) number of units per sqads (Please enter 5 <= number <= 10)? `);
+            })
+            .then((answerUnitsPerSquadNumber) => {
+              unitsPerSquadNumber = answerUnitsPerSquadNumber;
+              return { ArmyName: armyName, sqads: [] };
+            })
+            .then((army) => {
+              console.log(`\n\n*** Making sqads for Army(${armyName}) ***\n\n`);
+              for (let j = 0; j < squadsNumber; j++) {
+                army.sqads.push(createRandomSquad(unitsPerSquadNumber, strategy));
+                console.log(army.sqads[j].toString());
+              }
+              armies.push(army);
+              if (armies.length >= numberOfArmies) {
+                return callback(armies);
+              }
+              return resolve();
+            })
+            .catch((err) => {
+              console.log(err);
+              reject(err);
+            });
+        }));
+      }
+      return true;
+    });
+};
+
+rlp.write('\n******** Welcome to BATTLE ROYALE SIMULATOR!!! ********\n');
+init((armies) => {
+  rlp.write(`\n******** ${armies.length} Armies generated!!! ********\n`);
+  rlp.write('\n******** Press any key to exit BATTLE ROYALE SIMULATOR!!! ********\n');
+});
+

@@ -9,7 +9,6 @@ export default class Soldier extends Unit {
     }
 
     this.experience = _experience;
-    console.log(`\x1b[36m*** Soldier unit created { h:${this.getHealth()}, r:${this.getRecharge()}, exp:${this.getExperience()} } ***\x1b[39m`);
   }
 
   getExperience = () => (this.experience);
@@ -19,13 +18,15 @@ export default class Soldier extends Unit {
     const prob =
       0.5 * (1 + this.getHealth() / 100)
       * rnd(30 + this.getExperience(), 100) / 100;
-    console.log(`\x1b[36m*** Soldier next attack success probability is ${prob} ***\x1b[39m`);
+    console.log(`\x1b[36m*** Soldier(${this.name}) next attack success probability is ${prob} ***\x1b[39m`);
     return prob;
   }
 
   getNextAttackDamage = () => {
     const dmg = 0.05 + this.getExperience() / 100;
-    console.log(`\x1b[36m*** Soldier next attack damage is ${dmg} ***\x1b[39m`);
+    console.log(`\x1b[36m*** Soldier(${this.name}) next attack damage is ${dmg} ***\x1b[39m`);
     return dmg;
   }
+
+  toString = (pref = '\n\x1b[36m--') => (`${pref}Soldier(${this.name}) { h:${this.getHealth()}, r:${this.getRecharge()}, exp:${this.getExperience()} } \x1b[39m`);
 }
