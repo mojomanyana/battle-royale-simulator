@@ -38,7 +38,7 @@ export default class Unit {
 
   recieveDamage = () => {};
 
-  destoryUnit = () => {}
+  destroyUnit = () => {}
 
   isActive = () => {};
 

@@ -1,6 +1,7 @@
 import assert from 'assert';
 import randomWord from 'random-word';
 import Squad from './squad';
+import Logger from './helpers/utils';
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -27,7 +28,7 @@ export default class Army {
     }
 
     if (this.isActive() && defArmy.isActive()) {
-      console.log(`\n${this.name} is now attacking ${defArmy.name}\n`);
+      Logger.log(`\n${this.name} is now attacking ${defArmy.name}\n`);
       this.squads.forEach((squad) => {
         const defSquadRandom = defArmy.pickRandomSquad();
         const defSquadStrongest = defArmy.pickStrongestSquad();

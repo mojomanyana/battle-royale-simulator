@@ -1,4 +1,5 @@
 import Unit from './base/unit';
+import Logger from './helpers/utils';
 
 const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -27,7 +28,7 @@ export default class Soldier extends Unit {
       const prob =
         0.5 * (1 + this.getHealth() / 100)
         * rnd(30 + this.getExperience(), 100) / 100;
-      // console.log(`${this.name} next attack success probability is ${prob}`);
+      // Logger.log(`${this.name} next attack success probability is ${prob}`);
       return prob;
     }
     return 0;
@@ -36,7 +37,7 @@ export default class Soldier extends Unit {
   getNextAttackDamage = () => {
     if (this.isActive()) {
       const dmg = 0.05 + this.getExperience() / 100;
-      // console.log(`${this.name} next attack damage is ${dmg}`);
+      // Logger.log(`${this.name} next attack damage is ${dmg}`);
       return dmg;
     }
     return 0;
@@ -48,16 +49,16 @@ export default class Soldier extends Unit {
     }
   };
 
-  destoryUnit = () => {
+  destroyUnit = () => {
     this.baseHealth = 0;
-    console.log(`${this.name} destroyd!`);
+    Logger.log(`${this.name} destroyd!`);
   }
 
   recieveDamage = (dmg) => {
     this.baseHealth -= dmg;
-    console.log(`${this.name} recieved damage ${dmg}!`);
+    Logger.log(`${this.name} recieved damage ${dmg}!`);
     if (!this.isActive()) {
-      this.destoryUnit();
+      this.destroyUnit();
       return true;
     }
     return false;
