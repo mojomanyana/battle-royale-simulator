@@ -18,7 +18,7 @@ export default class Army {
       }
     });
 
-    this.name = randomWord();
+    this.randomName = randomWord();
   }
 
   attack = (defArmy) => {
@@ -27,13 +27,25 @@ export default class Army {
     }
 
     if (this.isActive() && defArmy.isActive()) {
-      console.log(`\nArmy(${this.name}) is now attacking Army(${defArmy.name})\n`);
+      console.log(`\n${this.name} is now attacking ${defArmy.name}\n`);
       this.squads.forEach((squad) => {
         const defSquadRandom = defArmy.pickRandomSquad();
+        const defSquadStrongest = defArmy.pickStrongestSquad();
+        const defSquadWeakest = defArmy.pickWeakestSquad();
         switch (squad.strategy) {
           case 'random':
-            if (squad.isActive() && defSquadRandom.isActive()) {
+            if (squad.isActive() && defSquadRandom && defSquadRandom.isActive()) {
               squad.attack(defSquadRandom);
+            }
+            break;
+          case 'weakest':
+            if (squad.isActive() && defSquadWeakest && defSquadWeakest.isActive()) {
+              squad.attack(defSquadWeakest);
+            }
+            break;
+          case 'strongest':
+            if (squad.isActive() && defSquadStrongest && defSquadStrongest.isActive()) {
+              squad.attack(defSquadStrongest);
             }
             break;
           default:
@@ -44,14 +56,42 @@ export default class Army {
   }
 
   pickRandomSquad = () => {
-    const index = rnd(0, this.squads.length - 1);
-    if (index > this.squads.length - 1) {
-      throw new RangeError('Invalid index');
+    const activeSquads = this.squads.filter(x => x.isActive());
+    const index = rnd(0, activeSquads.length - 1);
+    if (index > activeSquads.length - 1) {
+      return null;
     }
-    return this.squads[index];
+    return activeSquads[index];
   }
 
-  isActive = () => (this.squads.map(squad => (squad.isActive())).some(sa => (sa === true)));
+  pickStrongestSquad = () => {
+    const activeSquads = this.squads.filter(x => x.isActive());
+    const squadHealths = activeSquads.map(x => x.getHealth());
+    const index = squadHealths.indexOf(Math.max(...squadHealths));
+    if (index > activeSquads.length - 1) {
+      return null;
+    }
+    return activeSquads[index];
+  }
 
-  toString = (pref = '\n\x1b[33m-') => (`${pref}Army(${this.name}) { sqads:${this.squads.length} }${this.squads.map(squad => (squad.toString()))}\x1b[39m`);
+  pickWeakestSquad = () => {
+    const activeSquads = this.squads.filter(x => x.isActive());
+    const squadHealths = activeSquads.map(x => x.getHealth());
+    const index = squadHealths.indexOf(Math.min(...squadHealths));
+    if (index > activeSquads.length - 1) {
+      return null;
+    }
+    return activeSquads[index];
+  }
+
+  isActive = () => (this.squads.filter(squad => squad.isActive()).length > 0);
+
+  get name() {
+    if (this.isActive()) {
+      return `Army(${this.randomName}) \x1b[39m{ squads:${this.squads.filter(x => x.isActive()).length} }`;
+    }
+    return `\x1b[31m\x1b[4mArmy(${this.randomName})\x1b[0m\x1b[39m { squads:${this.squads.filter(x => x.isActive()).length} }\x1b[0m\x1b[39m`;
+  }
+
+  toString = (pref = '\n\x1b[33m-') => (`${pref}${this.name} ${this.squads.map(squad => (squad.toString()))}\x1b[39m`);
 }

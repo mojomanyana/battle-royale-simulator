@@ -45,13 +45,16 @@ const init = (callback) => {
   let squadsNumber;
   rlp.questionAsync('Enter number of armies on battlefield (Please enter number >= 2)? ')
     .then((numberOfArmiesAnswer) => {
-      numberOfArmies = numberOfArmiesAnswer;
+      if (Number.isNaN(parseInt(numberOfArmiesAnswer, 10))) {
+        throw new TypeError('You must enter a number bigger than 1 for number of armies');
+      }
+      numberOfArmies = parseInt(numberOfArmiesAnswer, 10);
       if (numberOfArmies < 2) {
-        throw new RangeError('You must enter number bigger than 1 for number of armies');
+        throw new RangeError('You must enter a number bigger than 1 for number of armies');
       }
       for (let i = 0, p = Promise.resolve(); i < numberOfArmies + 1; i++) {
         p = p.then(() => new Promise((resolve, reject) => {
-          rlp.questionAsync(`\n\nEnter Army(no. ${i + 1}/${numberOfArmies}) attack strategy (Please enter: random or weakest or strongest)? `)
+          rlp.questionAsync(`\nEnter Army(no. ${i + 1}/${numberOfArmies}) attack strategy (Please enter: random or weakest or strongest)? `)
             .then((answerStrategy) => {
               strategy = answerStrategy;
               if (strategy !== 'random' && strategy !== 'weakest' && strategy !== 'strongest') {
@@ -102,18 +105,18 @@ const simulate = (armies) => {
     }
   }
 
-  rlp.write('\n******** BATTLE IS NOW OVER!!! ********');
-  armies.forEach(army => (rlp.write(army.toString())));
+  rlp.write('\n******** BATTLE IS NOW OVER!!! ********\n');
+  armies.forEach(army => (rlp.write(`\n*** Aftermath for army ${army.toString()}`)));
   return armies.filter(x => x.isActive())[0];
 };
 
-rlp.write('\n******** Welcome to BATTLE ROYALE SIMULATOR!!! ********\n');
+rlp.write('\n******** Welcome to BATTLE ROYALE SIMULATOR!!! ********\n\n');
 init(async (armies) => {
   rlp.write(`\n******** ${armies.length} Armies generated!!! ********`);
   rlp.write('\n******** GET READY FOR RUMBLEEE!!! ********');
   const winner = simulate(armies);
   rlp.write(`\n******** We have a winner army ${winner.name}!!! ********`);
-  rlp.write('\n******** Press CTRL+z to exit BATTLE ROYALE SIMULATOR!!! ********\n');
+  rlp.write('\n******** exiting BATTLE ROYALE SIMULATOR!!! ********\n');
   process.exit();
 });
 

@@ -7,8 +7,8 @@ export default class Squad {
   constructor(_strategy, ..._units) {
     assert(_strategy);
     assert(_units);
-    // assert(_units.length >= 5);
-    // assert(_units.length <= 10);
+    assert(_units.length >= 5);
+    assert(_units.length <= 10);
 
     this.units = [];
     _units.forEach((unit) => {
@@ -30,7 +30,7 @@ export default class Squad {
     const activeUnits = this.units.filter(unit => unit.isActive());
     const opAttacks = activeUnits.map(unit => unit.getNewtAttackSuccessProbability());
     const prob = gmean(opAttacks);
-    console.log(`\x1b[35m${this.name} next attack success probability is ${prob} ***\x1b[39m`);
+    // console.log(`${this.name} next attack success probability is ${prob}`);
     return prob;
   }
 
@@ -38,7 +38,7 @@ export default class Squad {
     const activeUnits = this.units.filter(unit => unit.isActive());
     const opDmg = activeUnits.map(unit => unit.getNextAttackDamage());
     const dmg = opDmg.reduce((a, b) => (a + b));
-    console.log(`\x1b[35m${this.name} next attack damage is ${dmg} ***\x1b[39m`);
+    // console.log(`${this.name} next attack damage is ${dmg}`);
     return dmg;
   }
 
@@ -56,7 +56,7 @@ export default class Squad {
     }
 
     if (this.isActive() && defSquad.isActive()) {
-      console.log(`\x1b[35m${this.name} is attacking ${defSquad.name}\x1b[39m`);
+      console.log(`${this.name} is attacking ${defSquad.name}`);
       const probAtt = this.getNewtAttackSuccessProbability();
       const probDef = defSquad.getNewtAttackSuccessProbability();
       if (probAtt > probDef) {
@@ -69,7 +69,13 @@ export default class Squad {
     }
   }
 
-  isActive = () => (this.units.map(unit => (unit.isActive())).some(ua => (ua === true)));
+  isActive = () => (this.units.filter(unit => unit.isActive()).length > 0);
+
+  getHealth = () => {
+    const healts = this.units.map(x => x.getHealth());
+    const healtsSum = healts.reduce((a, b) => a + b, 0);
+    return healtsSum;
+  }
 
   get name() {
     if (this.isActive()) {

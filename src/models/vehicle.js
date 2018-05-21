@@ -40,6 +40,12 @@ export default class Vehicles extends Unit {
     return 0;
   }
 
+  getExperience = () => {
+    const activeOperators = this.operators.filter(x => x.isActive());
+    const expiriances = activeOperators.map(x => x.getExperience());
+    return expiriances.reduce((a, b) => a + b, 0);
+  }
+
   getTotalHealth = () => {
     let baseVehicleHealth = 0;
     if (this.baseHealth > 0 && this.baseHealth <= 100) {
@@ -61,7 +67,7 @@ export default class Vehicles extends Unit {
       const prob =
         0.5 * (1 + this.getTotalHealth() / 100)
         * gmean(opAttacks);
-      console.log(`\x1b[34m${this.name} next attack success probability is ${prob}\x1b[39m`);
+      // console.log(`${this.name} next attack success probability is ${prob}`);
       return prob;
     }
     return 0;
@@ -72,7 +78,7 @@ export default class Vehicles extends Unit {
       const activeOperators = this.operators.filter(x => x.isActive());
       const opExperiances = activeOperators.map(operator => operator.getExperience() / 100);
       const dmg = 0.1 + opExperiances.reduce((a, b) => (a + b));
-      console.log(`\x1b[34m${this.name}) next attack damage is ${dmg}\x1b[39m`);
+      // console.log(`${this.name}) next attack damage is ${dmg}`);
       return dmg;
     }
     return 0;
@@ -97,7 +103,7 @@ export default class Vehicles extends Unit {
         });
       }
 
-      console.log(`${this.name} recieved damage ${dmg}, health: ${this.getHealth()}, total health: ${this.getTotalHealth()}!`);
+      console.log(`${this.name} recieved damage ${dmg}!`);
       if (!this.isActive()) {
         this.destoryUnit();
         return true;
