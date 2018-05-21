@@ -6,11 +6,12 @@
   },
   "version": "1.0.0",
   "description": "Battle simulator written in node. Demo of node and js architecture in general.",
-  "main": "dist/index.js",
   "scripts": {
     "build": "webpack --config ./webpack.config.js",
     "lint": "eslint ./ -c ./.eslintrc",
-    "test": "nyc --require babel-core/register env DISABLELOGS=true mocha ./tests/*.test.js --timeout 15000"
+    "test": "nyc --require babel-core/register env DISABLELOGS=true mocha ./tests/*.test.js --timeout 15000",
+    "report": "nyc report --reporter=lcov",
+    "simulate": "node dist/index.js"
   },
   "repository": {
     "type": "git",

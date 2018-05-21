@@ -15,3 +15,13 @@ Battle simulator written in node. Demo of node and js architecture in general.
 - Finish `Basic local setup`
 - run `npm run lint`
 - This will run lint on all folders
+
+## Basic testing
+- Finish `Basic local setup`
+- run `npm run test`
+- This will run lint on all folders
+
+## Run simulator
+- Finish `Basic local setup`
+- Build simulator using `npm run build`
+- Run simulator using `npm run simulate`
