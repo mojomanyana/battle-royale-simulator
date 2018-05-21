@@ -17,12 +17,19 @@ export default class Unit {
       throw new TypeError('A unit recharge must be 100 - 2000');
     }
 
-    this.name = randomWord();
+    this.randomName = randomWord();
     this.baseHealth = _baseHealth;
     this.recharge = _recharge;
   }
 
-  getHealth = () => (this.baseHealth);
+  get name() {
+    if (this.isActive()) {
+      return `\x1b[32m${this.randomName}\x1b[39m`;
+    }
+    return `\x1b[31m\x1b[4m${this.randomName}\x1b[0m\x1b[39m`;
+  }
+
+  getHealth = () => (this.baseHealth)
 
   toString = (pref = '\x1b[39m') => (`${pref}Unit`);
 
@@ -32,17 +39,11 @@ export default class Unit {
 
   getNextAttackDamage = () => (0);
 
-  recieveDamage = (dmg) => {
-    this.baseHealth -= dmg;
-    if (this.baseHealth <= 0) {
-      this.destoryUnit();
-    }
-  };
+  recieveDamage = () => {};
 
-  destoryUnit = () => {
-    this.baseHealth = 0;
-    this.recharge = 0;
-  }
+  destoryUnit = () => {}
 
-  isActive = () => (this.baseHealth > 0);
+  isActive = () => {};
+
+  onSuccessfulAttack = () => {};
 }

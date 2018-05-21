@@ -1,5 +1,5 @@
 import readline from 'readline-promise';
-import randomWord from 'random-word';
+import Army from './models/army';
 import Soldier from './models/soldier';
 import Vehicle from './models/vehicle';
 import Squad from './models/squad';
@@ -43,34 +43,37 @@ const init = (callback) => {
   let numberOfArmies;
   let strategy;
   let squadsNumber;
-  let unitsPerSquadNumber;
   rlp.questionAsync('Enter number of armies on battlefield (Please enter number >= 2)? ')
     .then((numberOfArmiesAnswer) => {
       numberOfArmies = numberOfArmiesAnswer;
+      if (numberOfArmies < 2) {
+        throw new RangeError('You must enter number bigger than 1 for number of armies');
+      }
       for (let i = 0, p = Promise.resolve(); i < numberOfArmies + 1; i++) {
         p = p.then(() => new Promise((resolve, reject) => {
-          const armyName = randomWord();
-          console.log(`\n\n\n\n*** Initializing Army(${armyName}) ***\n\n`);
-          rlp.questionAsync(`Enter Army(${armyName}) attack strategy ("random", "weakest", "strongest")? `)
+          rlp.questionAsync(`\n\nEnter Army(no. ${i + 1}/${numberOfArmies}) attack strategy (Please enter: random or weakest or strongest)? `)
             .then((answerStrategy) => {
               strategy = answerStrategy;
-              return rlp.questionAsync(`Enter Army(${armyName}) number of sqads (Please enter number >= 2)? `);
+              if (strategy !== 'random' && strategy !== 'weakest' && strategy !== 'strongest') {
+                throw new TypeError('A strategy must be string type of value: "random", "weakest" or "strongest"');
+              }
+              return rlp.questionAsync(`Enter Army(no. ${i + 1}/${numberOfArmies}) number of sqads (Please enter number >= 2)? `);
             })
             .then((answerSqadsNumber) => {
               squadsNumber = answerSqadsNumber;
-              return rlp.questionAsync(`Enter Army(${armyName}) number of units per sqads (Please enter 5 <= number <= 10)? `);
+              return rlp.questionAsync(`Enter Army(no. ${i + 1}/${numberOfArmies}) number of units per sqads (Please enter 5 <= number <= 10)? `);
             })
             .then((answerUnitsPerSquadNumber) => {
-              unitsPerSquadNumber = answerUnitsPerSquadNumber;
-              return { ArmyName: armyName, sqads: [] };
+              const sqads = [];
+              for (let j = 0; j < squadsNumber; j++) {
+                sqads.push(createRandomSquad(answerUnitsPerSquadNumber, strategy));
+              }
+              return new Army(...sqads);
             })
             .then((army) => {
-              console.log(`\n\n*** Making sqads for Army(${armyName}) ***\n\n`);
-              for (let j = 0; j < squadsNumber; j++) {
-                army.sqads.push(createRandomSquad(unitsPerSquadNumber, strategy));
-                console.log(army.sqads[j].toString());
-              }
+              rlp.write(`\nArmy(no. ${armies.length + 1}/${numberOfArmies}) created:${army.toString()}`);
               armies.push(army);
+              rlp.write('\n');
               if (armies.length >= numberOfArmies) {
                 return callback(armies);
               }
@@ -86,9 +89,31 @@ const init = (callback) => {
     });
 };
 
+const simulate = (armies) => {
+  while (armies.filter(x => x.isActive()).length > 1) {
+    for (let i = 0; i < armies.length; i++) {
+      const attackingArmy = armies[i];
+      for (let j = 0; j < armies.length; j++) {
+        const defendingArmy = armies[j];
+        if (i !== j) {
+          attackingArmy.attack(defendingArmy);
+        }
+      }
+    }
+  }
+
+  rlp.write('\n******** BATTLE IS NOW OVER!!! ********');
+  armies.forEach(army => (rlp.write(army.toString())));
+  return armies.filter(x => x.isActive())[0];
+};
+
 rlp.write('\n******** Welcome to BATTLE ROYALE SIMULATOR!!! ********\n');
-init((armies) => {
-  rlp.write(`\n******** ${armies.length} Armies generated!!! ********\n`);
-  rlp.write('\n******** Press any key to exit BATTLE ROYALE SIMULATOR!!! ********\n');
+init(async (armies) => {
+  rlp.write(`\n******** ${armies.length} Armies generated!!! ********`);
+  rlp.write('\n******** GET READY FOR RUMBLEEE!!! ********');
+  const winner = simulate(armies);
+  rlp.write(`\n******** We have a winner army ${winner.name}!!! ********`);
+  rlp.write('\n******** Press CTRL+z to exit BATTLE ROYALE SIMULATOR!!! ********\n');
+  process.exit();
 });
 

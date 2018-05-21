@@ -3,6 +3,8 @@ import gmean from 'compute-gmean';
 import Unit from './base/unit';
 import Soldier from './soldier';
 
+const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
 export default class Vehicles extends Unit {
   constructor(_health, _recharge, _operator1, _operator2 = null, _operator3 = null) {
     super(_health, _recharge);
@@ -31,53 +33,96 @@ export default class Vehicles extends Unit {
     }
   }
 
-  getNumberOfOperators = () => (this.operators.length);
-
   getHealth = () => {
+    if (this.baseHealth > 0 && this.baseHealth <= 100) {
+      return this.baseHealth;
+    }
+    return 0;
+  }
+
+  getTotalHealth = () => {
+    let baseVehicleHealth = 0;
+    if (this.baseHealth > 0 && this.baseHealth <= 100) {
+      baseVehicleHealth = this.baseHealth;
+    }
     const healths = this.operators.map(operator => operator.getHealth());
-    const sum = this.baseHealth + healths.reduce((a, b) => a + b, 0);
-    return sum / this.operators.length + 1;
+    const sum = baseVehicleHealth + healths.reduce((a, b) => a + b, 0);
+    const hlt = sum / (healths.length + 1);
+    if (hlt > 0 && hlt <= Infinity) {
+      return hlt;
+    }
+    return 0;
   }
 
   getNewtAttackSuccessProbability = () => {
-    const opAttacks = this.operators.map(operator => operator.getNewtAttackSuccessProbability());
-    const prob =
-      0.5 * (1 + this.getHealth() / 100)
-      * gmean(opAttacks);
-    console.log(`\x1b[34m*** Vehicles(${this.name}) next attack success probability is ${prob} ***\x1b[39m`);
-    return prob;
+    if (this.isActive()) {
+      const activeOperators = this.operators.filter(x => x.isActive());
+      const opAttacks = activeOperators.map(operator => operator.getNewtAttackSuccessProbability());
+      const prob =
+        0.5 * (1 + this.getTotalHealth() / 100)
+        * gmean(opAttacks);
+      console.log(`\x1b[34m${this.name} next attack success probability is ${prob}\x1b[39m`);
+      return prob;
+    }
+    return 0;
   }
 
   getNextAttackDamage = () => {
-    const opExperiances = this.operators.map(operator => operator.getExperience() / 100);
-    const dmg = 0.1 + opExperiances.reduce((a, b) => (a + b));
-    console.log(`\x1b[34m*** Vehicles(${this.name}) next attack damage is ${dmg} ***\x1b[39m`);
-    return dmg;
+    if (this.isActive()) {
+      const activeOperators = this.operators.filter(x => x.isActive());
+      const opExperiances = activeOperators.map(operator => operator.getExperience() / 100);
+      const dmg = 0.1 + opExperiances.reduce((a, b) => (a + b));
+      console.log(`\x1b[34m${this.name}) next attack damage is ${dmg}\x1b[39m`);
+      return dmg;
+    }
+    return 0;
   }
 
   recieveDamage = (dmg) => {
-    this.baseHealth -= 0.3 * dmg;
-    const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-    const i = rnd(1, this.operators.length);
-    this.operators[i - 1].recieveDamage(0.5 * dmg);
+    if (this.isActive()) {
+      const activeOperators = this.operators.filter(x => x.isActive());
+      this.baseHealth -= 0.3 * dmg;
+      const i = rnd(1, activeOperators.length);
+      activeOperators[i - 1].recieveDamage(0.5 * dmg);
 
-    if (this.operators.length === 1) {
-      this.baseHealth -= 0.2 * dmg;
-    } else if (this.operators.length === 2) {
-      this.operators[((i - 1) === 0) ? 1 : 0].recieveDamage(0.2 * dmg);
-    } else if (this.operators.length === 3) {
-      this.operators.forEach((operator, j) => {
-        if ((i - 1) !== j) {
-          this.operators[j].recieveDamage(0.1 * dmg);
-        }
-      });
+      if (activeOperators.length === 1) {
+        this.baseHealth -= 0.2 * dmg;
+      } else if (activeOperators.length === 2) {
+        activeOperators[((i - 1) === 0) ? 1 : 0].recieveDamage(0.2 * dmg);
+      } else if (activeOperators.length === 3) {
+        activeOperators.forEach((operator, j) => {
+          if ((i - 1) !== j) {
+            activeOperators[j].recieveDamage(0.1 * dmg);
+          }
+        });
+      }
+
+      console.log(`${this.name} recieved damage ${dmg}, health: ${this.getHealth()}, total health: ${this.getTotalHealth()}!`);
+      if (!this.isActive()) {
+        this.destoryUnit();
+        return true;
+      }
     }
+    return false;
   };
 
   destroyUnit = () => {
+    this.baseHealth = 0;
+    console.log(`${this.name} destroyd!`);
     this.operators.forEach(operator => operator.destoryUnit());
-    super.destroyUnit();
   }
 
-  toString = (pref = '\n\x1b[34m--') => (`${pref}Vehicle(${this.name}) { h:${this.getHealth()}, r:${this.getRecharge()} }${this.operators.map(operator => (operator.toString(`${pref}-`)))}\x1b[39m`);
+  isActive = () => {
+    const activeOperators = this.operators.filter(x => x.isActive());
+    return this.getHealth() > 0 && activeOperators.length > 0;
+  }
+
+  get name() {
+    if (this.isActive()) {
+      return `Vehicle(${this.randomName}) \x1b[39m{ h:${this.getHealth()}, th:${this.getTotalHealth()}, r:${this.getRecharge()} }`;
+    }
+    return `\x1b[31m\x1b[4mVehicle(${this.randomName})\x1b[0m\x1b[39m { h:${this.getHealth()}, th:${this.getTotalHealth()}, r:${this.getRecharge()} }`;
+  }
+
+  toString = (pref = '\n\x1b[34m--') => (`${pref}${this.name} ${this.operators.map(operator => (operator.toString(`${pref}-`)))}`);
 }
