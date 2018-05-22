@@ -2,7 +2,7 @@ import assert from 'assert';
 import gmean from 'compute-gmean';
 import randomWord from 'random-word';
 import Unit from './base/unit';
-import Logger from './helpers/utils';
+import Utils from './helpers/utils';
 
 export default class Squad {
   constructor(_strategy, ..._units) {
@@ -32,7 +32,7 @@ export default class Squad {
       const activeUnits = this.units.filter(unit => unit.isActive());
       const opAttacks = activeUnits.map(unit => unit.getNewtAttackSuccessProbability());
       const prob = gmean(opAttacks);
-      // Logger.log(`${this.name} next attack success probability is ${prob}`);
+      // Utils.log(`${this.name} next attack success probability is ${prob}`);
       return prob;
     }
     return 0;
@@ -43,7 +43,7 @@ export default class Squad {
       const activeUnits = this.units.filter(unit => unit.isActive());
       const opDmg = activeUnits.map(unit => unit.getNextAttackDamage());
       const dmg = opDmg.reduce((a, b) => (a + b));
-      // Logger.log(`${this.name} next attack damage is ${dmg}`);
+      // Utils.log(`${this.name} next attack damage is ${dmg}`);
       return dmg;
     }
     return 0;
@@ -63,7 +63,7 @@ export default class Squad {
     }
 
     if (this.isActive() && defSquad.isActive()) {
-      Logger.log(`${this.name} is attacking ${defSquad.name}`);
+      Utils.log(`${this.name} is attacking ${defSquad.name}`);
       const probAtt = this.getNewtAttackSuccessProbability();
       const probDef = defSquad.getNewtAttackSuccessProbability();
       if (probAtt > probDef) {
