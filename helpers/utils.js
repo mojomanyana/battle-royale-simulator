@@ -13,7 +13,8 @@ const logger = winston.createLogger({
 export default class Utils {
   static log = (message, level = 'debug') => {
     if (!process.env.DISABLELOGS) {
-      logger.log({ level, message });
+      // logger.log({ level, message });
+      console.log(message);
     }
   }
 

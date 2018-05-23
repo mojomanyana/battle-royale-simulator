@@ -11,7 +11,7 @@ export default class RandomStrategy extends Strategy {
     const activeSquads = army.squads.filter(x => x.isActive());
     if (activeSquads.length === 0) {
       return null;
-    } else if (activeSquads.length === 0) {
+    } else if (activeSquads.length === 1) {
       return activeSquads[0];
     }
 

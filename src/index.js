@@ -37,90 +37,99 @@ const createRandomSquad = (numberOfUnits, strategy) => {
   return new Squad(strategy, ...units);
 };
 
-const getArmyNextInputRecursion = async (promissesArray, numberOfArmies, i) => {
-  let strategy;
-  let squadsNumber;
-  await rlp.questionAsync(`Enter Army(no. ${i + 1}/${numberOfArmies}) attack strategy (Please enter: random or weakest or strongest)? `)
-    .then((answerStrategy) => {
-      strategy = answerStrategy;
-      return rlp.questionAsync(`Enter Army(no. ${i + 1}/${numberOfArmies}) number of sqads (Please enter number >= 2)? `);
-    })
-    .then((answerSqadsNumber) => {
-      squadsNumber = answerSqadsNumber;
-      return rlp.questionAsync(`Enter Army(no. ${i + 1}/${numberOfArmies}) number of units per sqads (Please enter 5 <= number <= 10)? `);
-    })
-    .then((answerUnitsPerSquadNumber) => {
-      const sqads = [];
-      for (let j = 0; j < squadsNumber; j++) {
-        sqads.push(createRandomSquad(answerUnitsPerSquadNumber, strategy));
-      }
-      return new Army(...sqads);
-    })
-    .then((army) => {
-      Utils.log(`Army(no. ${i + 1}/${numberOfArmies}) created:${army.toString()}`, 'info');
-      Utils.log('********************************************************', 'info');
-      promissesArray.push(new Promise((resolve) => { resolve(army); }));
-      return i + 1;
-    })
-    .then(async (j) => {
-      if (j >= numberOfArmies) {
-        return true;
-      }
-      await getArmyNextInputRecursion(promissesArray, numberOfArmies, j);
-      return true;
-    })
-    .catch((err) => {
-      throw err;
-    });
-};
-
-const init = async (callback) => {
-  let numberOfArmies;
-  await rlp.questionAsync('Enter number of armies on battlefield (Please enter number >= 2)? ')
-    .then(async (numberOfArmiesAnswer) => {
-      if (Number.isNaN(parseInt(numberOfArmiesAnswer, 10))) {
-        throw new TypeError('You must enter a number bigger than 1 for number of armies');
-      }
-      numberOfArmies = parseInt(numberOfArmiesAnswer, 10);
-      if (numberOfArmies < 2) {
-        throw new RangeError('You must enter a number bigger than 1 for number of armies');
-      }
-
-      const promissesArray = [];
-      await getArmyNextInputRecursion(promissesArray, numberOfArmies, 0);
-      Promise.all(promissesArray).then((armies) => {
-        callback(armies);
+const getNextArmyInput = (numberOfArmies, i) => (
+  new Promise(async (resolve, reject) => {
+    let strategy;
+    let squadsNumber;
+    await rlp.questionAsync(`Enter Army(no. ${i + 1}/${numberOfArmies}) attack strategy (Please enter: random or weakest or strongest)? `)
+      .then((answerStrategy) => {
+        strategy = answerStrategy;
+        return rlp.questionAsync(`Enter Army(no. ${i + 1}/${numberOfArmies}) number of squads (Please enter number >= 2)? `);
+      })
+      .then((answerSqadsNumber) => {
+        squadsNumber = answerSqadsNumber;
+        return rlp.questionAsync(`Enter Army(no. ${i + 1}/${numberOfArmies}) number of units per squad (Please enter 5 <= number <= 10)? `);
+      })
+      .then((answerUnitsPerSquadNumber) => {
+        const sqads = [];
+        for (let j = 0; j < squadsNumber; j++) {
+          sqads.push(createRandomSquad(answerUnitsPerSquadNumber, strategy));
+        }
+        return new Army(...sqads);
+      })
+      .then((army) => {
+        Utils.log(`Army(no. ${i + 1}/${numberOfArmies}) created:${army.toString()}`, 'info');
+        Utils.log('********************************************************', 'info');
+        resolve(army);
+      })
+      .catch((err) => {
+        reject(err);
       });
-    });
-};
+  })
+);
 
-const simulate = (armies, callback) => {
-  while (armies.filter(x => x.isActive()).length > 1) {
-    for (let i = 0; i < armies.length; i++) {
-      const attackingArmy = armies[i];
-      for (let j = 0; j < armies.length; j++) {
-        const defendingArmy = armies[j];
-        if (i !== j) {
-          attackingArmy.attack(defendingArmy);
+const init = () => (
+  new Promise(async (resolve, reject) => {
+    let numberOfArmies;
+    await rlp.questionAsync('Enter number of armies on battlefield (Please enter number >= 2)? ')
+      .then(async (numberOfArmiesAnswer) => {
+        if (Number.isNaN(parseInt(numberOfArmiesAnswer, 10))) {
+          throw new TypeError('You must enter a number bigger than 1 for number of armies');
+        }
+        numberOfArmies = parseInt(numberOfArmiesAnswer, 10);
+        if (numberOfArmies < 2) {
+          throw new RangeError('You must enter a number bigger than 1 for number of armies');
+        }
+
+        const promissesArray = [];
+        for (let i = 0; i < numberOfArmies; i++) {
+          const newArmyImputPromise = await getNextArmyInput(numberOfArmies, i);
+          promissesArray.push(newArmyImputPromise);
+        }
+        Promise.all(promissesArray).then((armies) => {
+          resolve(armies);
+        });
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  })
+);
+
+const simulate = armies => (
+  new Promise(async (resolve) => {
+    while (armies.filter(x => x.isActive()).length > 1) {
+      for (let i = 0; i < armies.length; i++) {
+        const attackingArmy = armies[i];
+        for (let j = 0; j < armies.length; j++) {
+          const defendingArmy = armies[j];
+          if (i !== j) {
+            attackingArmy.attack(defendingArmy);
+          }
         }
       }
     }
-  }
-
-  callback(armies);
-};
+    resolve(armies);
+  })
+);
 
 Utils.log('******** Welcome to BATTLE ROYALE SIMULATOR!!! ********', 'info');
-init(async (armies) => {
-  Utils.log(`******** ${armies.length} Armies generated!!! ********`, 'info');
-  Utils.log('******** SIMULATING BATTLE NOW!!! ********', 'info');
-  simulate(armies, async (armiesFinal) => {
+init()
+  .then(async (armies) => {
+    Utils.log(`******** ${armies.length} Armies generated!!! ********`, 'info');
+    Utils.log('******** SIMULATING BATTLE NOW!!! ********', 'info');
+    return simulate(armies);
+  })
+  .then(async (armiesAfterFight) => {
     Utils.log('******** BATTLE IS NOW OVER!!! ********', 'info');
-    armiesFinal.forEach(army => (Utils.log(`******** Aftermath for army ********${army.toString()}`)));
-    const winner = armiesFinal.filter(x => x.isActive())[0];
+    armiesAfterFight.forEach(army => (Utils.log(`******** Aftermath for army ********${army.toString()}`)));
+    const winner = armiesAfterFight.filter(x => x.isActive())[0];
     Utils.log(`******** We have a winner army ${winner.name}!!! ********`, 'info');
     Utils.log('******** exiting BATTLE ROYALE SIMULATOR!!! ********', 'info');
-    // process.exit(0);
+    process.exit(0);
+  })
+  .catch((err) => {
+    Utils.log(err.message, 'error');
+    process.exit(1);
   });
-});
 
