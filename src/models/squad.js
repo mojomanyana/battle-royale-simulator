@@ -2,6 +2,7 @@ import assert from 'assert';
 import gmean from 'compute-gmean';
 import randomWord from 'random-word';
 import Unit from './base/unit';
+import StrategyFactory from './strategy/strategyFactory';
 // import Utils from '../../helpers/utils';
 
 export default class Squad {
@@ -20,10 +21,8 @@ export default class Squad {
       }
     });
 
-    if (_strategy !== 'random' && _strategy !== 'weakest' && _strategy !== 'strongest') {
-      throw new TypeError('A strategy must be string type of value: "random", "weakest" or "strongest"');
-    }
-    this.strategy = _strategy;
+    const factory = new StrategyFactory();
+    this.strategy = factory.createStrategy(_strategy);
     this.randomName = randomWord();
   }
 
@@ -57,12 +56,9 @@ export default class Squad {
     });
   }
 
-  attack = (defSquad) => {
-    if (!(defSquad instanceof Squad)) {
-      throw new TypeError('A defending squad must be type of Squad');
-    }
-
-    if (this.isActive() && defSquad.isActive()) {
+  attack = (army) => {
+    const defSquad = this.strategy.getSquadToAttackFromArmy(army);
+    if (this.isActive() && defSquad != null && defSquad.isActive()) {
       // Utils.log(`${this.name} is attacking ${defSquad.name}`, 'debug');
       const probAtt = this.getNewtAttackSuccessProbability();
       const probDef = defSquad.getNewtAttackSuccessProbability();

@@ -43,9 +43,6 @@ const getArmyNextInputRecursion = async (promissesArray, numberOfArmies, i) => {
   await rlp.questionAsync(`Enter Army(no. ${i + 1}/${numberOfArmies}) attack strategy (Please enter: random or weakest or strongest)? `)
     .then((answerStrategy) => {
       strategy = answerStrategy;
-      if (strategy !== 'random' && strategy !== 'weakest' && strategy !== 'strongest') {
-        throw new TypeError('A strategy must be string type of value: "random", "weakest" or "strongest"');
-      }
       return rlp.questionAsync(`Enter Army(no. ${i + 1}/${numberOfArmies}) number of sqads (Please enter number >= 2)? `);
     })
     .then((answerSqadsNumber) => {

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import randomWord from 'random-word';
 import Squad from './squad';
-import Utils from '../../helpers/utils';
+// import Utils from '../../helpers/utils';
 
 export default class Army {
   constructor(..._squads) {
@@ -21,66 +21,10 @@ export default class Army {
   }
 
   attack = (defArmy) => {
-    if (!(defArmy instanceof Army)) {
-      throw new TypeError('A defending army must be type of Army');
-    }
-
     if (this.isActive() && defArmy.isActive()) {
       // Utils.log(`${this.name} is now attacking ${defArmy.name}`, 'debug');
-      this.squads.forEach((squad) => {
-        const defSquadRandom = defArmy.pickRandomSquad();
-        const defSquadStrongest = defArmy.pickStrongestSquad();
-        const defSquadWeakest = defArmy.pickWeakestSquad();
-        switch (squad.strategy) {
-          case 'random':
-            if (squad.isActive() && defSquadRandom && defSquadRandom.isActive()) {
-              squad.attack(defSquadRandom);
-            }
-            break;
-          case 'weakest':
-            if (squad.isActive() && defSquadWeakest && defSquadWeakest.isActive()) {
-              squad.attack(defSquadWeakest);
-            }
-            break;
-          case 'strongest':
-            if (squad.isActive() && defSquadStrongest && defSquadStrongest.isActive()) {
-              squad.attack(defSquadStrongest);
-            }
-            break;
-          default:
-            throw new TypeError('squad.strategy must be defined');
-        }
-      });
+      this.squads.forEach((squad) => { squad.attack(defArmy); });
     }
-  }
-
-  pickRandomSquad = () => {
-    const activeSquads = this.squads.filter(x => x.isActive());
-    const index = Utils.rnd(0, activeSquads.length - 1);
-    if (index > activeSquads.length - 1) {
-      return null;
-    }
-    return activeSquads[index];
-  }
-
-  pickStrongestSquad = () => {
-    const activeSquads = this.squads.filter(x => x.isActive());
-    const squadHealths = activeSquads.map(x => x.getHealth());
-    const index = squadHealths.indexOf(Math.max(...squadHealths));
-    if (index > activeSquads.length - 1) {
-      return null;
-    }
-    return activeSquads[index];
-  }
-
-  pickWeakestSquad = () => {
-    const activeSquads = this.squads.filter(x => x.isActive());
-    const squadHealths = activeSquads.map(x => x.getHealth());
-    const index = squadHealths.indexOf(Math.min(...squadHealths));
-    if (index > activeSquads.length - 1) {
-      return null;
-    }
-    return activeSquads[index];
   }
 
   isActive = () => (this.squads.filter(squad => squad.isActive()).length > 0);
