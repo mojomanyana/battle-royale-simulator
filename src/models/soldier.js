@@ -1,5 +1,5 @@
 import Unit from './base/unit';
-import Utils from './helpers/utils';
+import Utils from '../../helpers/utils';
 
 export default class Soldier extends Unit {
   constructor(_health, _recharge, _experience) {
@@ -49,12 +49,12 @@ export default class Soldier extends Unit {
 
   destroyUnit = () => {
     this.baseHealth = 0;
-    Utils.log(`${this.name} destroyd!`);
+    Utils.log(`Soldier(${this.randomName}) destroyd!`);
   }
 
   recieveDamage = (dmg) => {
     this.baseHealth -= dmg;
-    Utils.log(`${this.name} recieved damage ${dmg}!`);
+    // Utils.log(`${this.name} recieved damage ${dmg}!`);
     if (!this.isActive()) {
       this.destroyUnit();
       return true;
@@ -65,11 +65,8 @@ export default class Soldier extends Unit {
   isActive = () => (this.getHealth() > 0);
 
   get name() {
-    if (this.isActive()) {
-      return `Soldier(${this.randomName})\x1b[39m { h:${this.getHealth()}, r:${this.getRecharge()}, exp:${this.getExperience()} }`;
-    }
-    return `\x1b[31m\x1b[4mSoldier(${this.randomName})\x1b[0m\x1b[39m { h:${this.getHealth()}, r:${this.getRecharge()}, exp:${this.getExperience()} }`;
+    return `Soldier(${this.randomName}) { h:${this.getHealth()}, r:${this.getRecharge()}, exp:${this.getExperience()} }`;
   }
 
-  toString = (pref = '\n\x1b[36m--') => (`${pref}${this.name}`);
+  toString = (pref = '') => (`${pref}${this.name}`);
 }

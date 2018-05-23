@@ -2,7 +2,7 @@ import assert from 'assert';
 import gmean from 'compute-gmean';
 import Unit from './base/unit';
 import Soldier from './soldier';
-import Utils from './helpers/utils';
+import Utils from '../../helpers/utils';
 
 export default class Vehicles extends Unit {
   constructor(_health, _recharge, _operator1, _operator2 = null, _operator3 = null) {
@@ -102,7 +102,7 @@ export default class Vehicles extends Unit {
         });
       }
 
-      Utils.log(`${this.name} recieved damage ${dmg}!`);
+      // Utils.log(`${this.name} recieved damage ${dmg}!`);
       if (!this.isActive()) {
         this.destroyUnit();
         return true;
@@ -113,7 +113,7 @@ export default class Vehicles extends Unit {
 
   destroyUnit = () => {
     this.baseHealth = 0;
-    Utils.log(`${this.name} destroyd!`);
+    Utils.log(`Vehicle(${this.randomName}) destroyd!`);
     this.operators.forEach(operator => operator.destroyUnit());
   }
 
@@ -123,11 +123,8 @@ export default class Vehicles extends Unit {
   }
 
   get name() {
-    if (this.isActive()) {
-      return `Vehicle(${this.randomName}) \x1b[39m{ h:${this.getHealth()}, th:${this.getTotalHealth()}, r:${this.getRecharge()} }`;
-    }
-    return `\x1b[31m\x1b[4mVehicle(${this.randomName})\x1b[0m\x1b[39m { h:${this.getHealth()}, th:${this.getTotalHealth()}, r:${this.getRecharge()} }`;
+    return `Vehicle(${this.randomName}) { h:${this.getHealth()}, th:${this.getTotalHealth()}, r:${this.getRecharge()} }`;
   }
 
-  toString = (pref = '\n\x1b[34m--') => (`${pref}${this.name} ${this.operators.map(operator => (operator.toString(`${pref}-`)))}`);
+  toString = (pref = '') => (`${pref}${this.name} ${this.operators.map(operator => (operator.toString('\n---')))}`);
 }

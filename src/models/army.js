@@ -1,7 +1,7 @@
 import assert from 'assert';
 import randomWord from 'random-word';
 import Squad from './squad';
-import Utils from './helpers/utils';
+import Utils from '../../helpers/utils';
 
 export default class Army {
   constructor(..._squads) {
@@ -26,7 +26,7 @@ export default class Army {
     }
 
     if (this.isActive() && defArmy.isActive()) {
-      Utils.log(`\n${this.name} is now attacking ${defArmy.name}\n`);
+      // Utils.log(`${this.name} is now attacking ${defArmy.name}`, 'debug');
       this.squads.forEach((squad) => {
         const defSquadRandom = defArmy.pickRandomSquad();
         const defSquadStrongest = defArmy.pickStrongestSquad();
@@ -86,11 +86,8 @@ export default class Army {
   isActive = () => (this.squads.filter(squad => squad.isActive()).length > 0);
 
   get name() {
-    if (this.isActive()) {
-      return `Army(${this.randomName}) \x1b[39m{ squads:${this.squads.filter(x => x.isActive()).length} }`;
-    }
-    return `\x1b[31m\x1b[4mArmy(${this.randomName})\x1b[0m\x1b[39m { squads:${this.squads.filter(x => x.isActive()).length} }\x1b[0m\x1b[39m`;
+    return `Army(${this.randomName}) { squads:${this.squads.filter(x => x.isActive()).length} }`;
   }
 
-  toString = (pref = '\n\x1b[33m-') => (`${pref}${this.name} ${this.squads.map(squad => (squad.toString()))}\x1b[39m`);
+  toString = (pref = '\n') => (`${pref}${this.name} ${this.squads.map(squad => (squad.toString('\n-')))}`);
 }

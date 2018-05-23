@@ -2,7 +2,7 @@ import assert from 'assert';
 import gmean from 'compute-gmean';
 import randomWord from 'random-word';
 import Unit from './base/unit';
-import Utils from './helpers/utils';
+// import Utils from '../../helpers/utils';
 
 export default class Squad {
   constructor(_strategy, ..._units) {
@@ -32,7 +32,7 @@ export default class Squad {
       const activeUnits = this.units.filter(unit => unit.isActive());
       const opAttacks = activeUnits.map(unit => unit.getNewtAttackSuccessProbability());
       const prob = gmean(opAttacks);
-      // Utils.log(`${this.name} next attack success probability is ${prob}`);
+      // Utils.log(`${this.name} next attack success probability is ${prob}`, 'debug');
       return prob;
     }
     return 0;
@@ -43,7 +43,7 @@ export default class Squad {
       const activeUnits = this.units.filter(unit => unit.isActive());
       const opDmg = activeUnits.map(unit => unit.getNextAttackDamage());
       const dmg = opDmg.reduce((a, b) => (a + b));
-      // Utils.log(`${this.name} next attack damage is ${dmg}`);
+      // Utils.log(`${this.name} next attack damage is ${dmg}`, 'debug');
       return dmg;
     }
     return 0;
@@ -63,7 +63,7 @@ export default class Squad {
     }
 
     if (this.isActive() && defSquad.isActive()) {
-      Utils.log(`${this.name} is attacking ${defSquad.name}`);
+      // Utils.log(`${this.name} is attacking ${defSquad.name}`, 'debug');
       const probAtt = this.getNewtAttackSuccessProbability();
       const probDef = defSquad.getNewtAttackSuccessProbability();
       if (probAtt > probDef) {
@@ -85,11 +85,8 @@ export default class Squad {
   }
 
   get name() {
-    if (this.isActive()) {
-      return `Squad(${this.randomName}) \x1b[39m{ units:${this.units.filter(x => x.isActive()).length} }`;
-    }
-    return `\x1b[31m\x1b[4mSquad(${this.randomName})\x1b[0m\x1b[39m { units:${this.units.filter(x => x.isActive()).length} }\x1b[0m\x1b[39m`;
+    return `Squad(${this.randomName}) { units:${this.units.filter(x => x.isActive()).length} }`;
   }
 
-  toString = (pref = '\n\x1b[35m-') => (`${pref}${this.name}${this.units.map(operator => (operator.toString()))}\x1b[39m`);
+  toString = (pref = '') => (`${pref}${this.name}${this.units.map(operator => (operator.toString('\n--')))}`);
 }
