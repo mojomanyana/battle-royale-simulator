@@ -20,14 +20,16 @@ export default class Army {
     this.randomName = randomWord();
   }
 
-  attack = (defArmy) => {
-    if (this.isActive() && defArmy.isActive()) {
-      Utils.log(`${this.name} is now attacking ${defArmy.name}`, 'debug');
-      this.squads.forEach((squad) => { squad.attack(defArmy); });
-    }
-  }
-
   isActive = () => (this.squads.filter(squad => squad.isActive()).length > 0);
+
+  joinWar = foeArmies => (
+    new Promise(async (resolve) => {
+      Utils.log(`${this.name} is going to war`, 'debug');
+      const foeSquads = [];
+      foeArmies.forEach(army => foeSquads.push(...army.squads));
+      this.squads.forEach(squad => squad.startAttackingFoes(foeSquads, resolve));
+    })
+  )
 
   get name() {
     return `Army(${this.randomName}) { squads:${this.squads.filter(x => x.isActive()).length} }`;

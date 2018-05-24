@@ -9,7 +9,7 @@
   "scripts": {
     "build": "webpack --config ./webpack.config.js",
     "lint": "eslint ./ -c ./.eslintrc",
-    "test": "nyc --require babel-core/register env DISABLELOGS=true mocha ./tests/*.test.js --timeout 15000",
+    "test": "nyc --require babel-core/register env DISABLELOGS=true mocha ./tests/*.test.js --timeout 60000",
     "report": "nyc report --reporter=lcov",
     "simulate": "node dist/index.js"
   },

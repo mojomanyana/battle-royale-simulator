@@ -26,7 +26,7 @@ export default class Soldier extends Unit {
       const prob =
         0.5 * (1 + this.getHealth() / 100)
         * Utils.rnd(30 + this.getExperience(), 100) / 100;
-      // Utils.log(`${this.name} next attack success probability is ${prob}`);
+      Utils.log(`${this.name} next attack success probability is ${prob}`);
       return prob;
     }
     return 0;
@@ -35,7 +35,7 @@ export default class Soldier extends Unit {
   getNextAttackDamage = () => {
     if (this.isActive()) {
       const dmg = 0.05 + this.getExperience() / 100;
-      // Utils.log(`${this.name} next attack damage is ${dmg}`);
+      Utils.log(`${this.name} next attack damage is ${dmg}`, 'debug');
       return dmg;
     }
     return 0;
@@ -54,7 +54,7 @@ export default class Soldier extends Unit {
 
   recieveDamage = (dmg) => {
     this.baseHealth -= dmg;
-    // Utils.log(`${this.name} recieved damage ${dmg}!`);
+    Utils.log(`${this.name} recieved damage ${dmg}!`);
     if (!this.isActive()) {
       this.destroyUnit();
       return true;

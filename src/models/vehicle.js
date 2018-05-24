@@ -66,7 +66,7 @@ export default class Vehicles extends Unit {
       const prob =
         0.5 * (1 + this.getTotalHealth() / 100)
         * gmean(opAttacks);
-      // Utils.log(`${this.name} next attack success probability is ${prob}`);
+      Utils.log(`${this.name} next attack success probability is ${prob}`);
       return prob;
     }
     return 0;
@@ -77,7 +77,7 @@ export default class Vehicles extends Unit {
       const activeOperators = this.operators.filter(x => x.isActive());
       const opExperiances = activeOperators.map(operator => operator.getExperience() / 100);
       const dmg = 0.1 + opExperiances.reduce((a, b) => (a + b));
-      // Utils.log(`${this.name}) next attack damage is ${dmg}`);
+      Utils.log(`${this.name}) next attack damage is ${dmg}`);
       return dmg;
     }
     return 0;
@@ -102,7 +102,7 @@ export default class Vehicles extends Unit {
         });
       }
 
-      // Utils.log(`${this.name} recieved damage ${dmg}!`);
+      Utils.log(`${this.name} recieved damage ${dmg}!`);
       if (!this.isActive()) {
         this.destroyUnit();
         return true;

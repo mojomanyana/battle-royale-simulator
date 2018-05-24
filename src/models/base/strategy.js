@@ -6,7 +6,7 @@ export default class Strategy {
     }
   }
 
-  getSquadToAttackFromArmy = (army) => { // eslint-disable-line no-unused-vars
+  getSquadToAttack = (squads) => { // eslint-disable-line no-unused-vars
     throw new Error('Method not implemented');
   }
 

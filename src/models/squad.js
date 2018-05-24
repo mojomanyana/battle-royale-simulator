@@ -31,7 +31,7 @@ export default class Squad {
       const activeUnits = this.units.filter(unit => unit.isActive());
       const opAttacks = activeUnits.map(unit => unit.getNewtAttackSuccessProbability());
       const prob = gmean(opAttacks);
-      // Utils.log(`${this.name} next attack success probability is ${prob}`, 'debug');
+      Utils.log(`${this.name} next attack success probability is ${prob}`, 'debug');
       return prob;
     }
     return 0;
@@ -42,7 +42,7 @@ export default class Squad {
       const activeUnits = this.units.filter(unit => unit.isActive());
       const opDmg = activeUnits.map(unit => unit.getNextAttackDamage());
       const dmg = opDmg.reduce((a, b) => (a + b));
-      // Utils.log(`${this.name} next attack damage is ${dmg}`, 'debug');
+      Utils.log(`${this.name} next attack damage is ${dmg}`, 'debug');
       return dmg;
     }
     return 0;
@@ -56,8 +56,8 @@ export default class Squad {
     });
   }
 
-  attack = (army) => {
-    const defSquad = this.strategy.getSquadToAttackFromArmy(army);
+  attack = (foeSquads) => {
+    const defSquad = this.strategy.getSquadToAttack(foeSquads);
     if (this.isActive() && defSquad != null && defSquad.isActive()) {
       Utils.log(`${this.name} is attacking ${defSquad.name}`, 'debug');
       const probAtt = this.getNewtAttackSuccessProbability();
@@ -70,6 +70,27 @@ export default class Squad {
         });
       }
     }
+  }
+
+  startAttackingFoes = (foeSquads, resolve) => {
+    const recharges = this.units.map(x => x.getRecharge());
+    const rechargesAvg = recharges.reduce((a, b) => a + b, 0) / this.units.length;
+    this.attackInterval = setInterval(() => {
+      if (this.isActive() && foeSquads.filter(x => x.isActive()).length > 0) {
+        return this.attack(foeSquads);
+      }
+      return this.stopAttackingFoes(resolve);
+    }, rechargesAvg);
+  }
+
+  stopAttackingFoes = (resolve) => {
+    clearInterval(this.attackInterval);
+    if (this.isActive()) {
+      Utils.log(`${this.name} is still alive`, 'debug');
+    } else {
+      Utils.log(`${this.name} is destroyed`, 'debug');
+    }
+    resolve();
   }
 
   isActive = () => (this.units.filter(unit => unit.isActive()).length > 0);

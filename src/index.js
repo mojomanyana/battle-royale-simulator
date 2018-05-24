@@ -98,18 +98,21 @@ const init = () => (
 
 const simulate = armies => (
   new Promise(async (resolve) => {
-    while (armies.filter(x => x.isActive()).length > 1) {
-      for (let i = 0; i < armies.length; i++) {
-        const attackingArmy = armies[i];
-        for (let j = 0; j < armies.length; j++) {
-          const defendingArmy = armies[j];
-          if (i !== j) {
-            attackingArmy.attack(defendingArmy);
-          }
+    const promissesArray = [];
+    for (let i = 0; i < armies.length; i++) {
+      const attackingArmy = armies[i];
+      const foeArmies = [];
+      for (let j = 0; j < armies.length; j++) {
+        if (i !== j) {
+          foeArmies.push(armies[j]);
         }
       }
+      const armyInWar = attackingArmy.joinWar(foeArmies);
+      promissesArray.push(armyInWar);
     }
-    resolve(armies);
+    Promise.all(promissesArray).then(() => {
+      resolve(armies);
+    });
   })
 );
 
@@ -126,6 +129,9 @@ init()
     const winner = armiesAfterFight.filter(x => x.isActive())[0];
     Utils.log(`******** We have a winner army ${winner.name}!!! ********`, 'info');
     Utils.log('******** exiting BATTLE ROYALE SIMULATOR!!! ********', 'info');
+    return rlp.questionAsync('Press ENTER to exit');
+  })
+  .then(() => {
     process.exit(0);
   })
   .catch((err) => {
