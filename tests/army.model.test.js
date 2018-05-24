@@ -3,6 +3,7 @@ import Soldier from '../src/models/soldier';
 import Vehicle from '../src/models/vehicle';
 import Squad from '../src/models/squad';
 import Army from '../src/models/army';
+import Utils from '../helpers/utils';
 
 const soldier1 = new Soldier(1, 100, 3);
 const soldier2 = new Soldier(1, 100, 6);
@@ -87,7 +88,7 @@ describe('Models - Army', () => {
       const army = new Army(squad, {});
       army.isActive();
     } catch (error) {
-      assert(error.message === 'A unit must be type of Squad');
+      assert(error.message === Utils.ERR_NOT_SQUAD);
       done();
     }
   });

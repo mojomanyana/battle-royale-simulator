@@ -8,25 +8,25 @@ export default class Vehicles extends Unit {
   constructor(_health, _recharge, _operator1, _operator2 = null, _operator3 = null) {
     super(_health, _recharge);
 
-    assert(_operator1, 'At least 1 opperator is required');
+    assert(_operator1, Utils.ERR_OPERATOR_REQUIRED);
     if (!(_operator1 instanceof Soldier)) {
-      throw new TypeError('A operator 1 unit must be type of Soldier');
+      throw new TypeError(Utils.ERR_NOT_SOLDIER);
     }
     if (_recharge < 1000) {
-      throw new TypeError('A vehicle recharge must be greater than 1000');
+      throw new RangeError(Utils.ERR_RECHARGEVEHICLE_RANGE);
     }
 
     this.operators = [];
     this.operators.push(_operator1);
     if (_operator2) {
       if (!(_operator2 instanceof Soldier)) {
-        throw new TypeError('A operator 2 unit must be type of Soldier');
+        throw new TypeError(Utils.ERR_NOT_SOLDIER);
       }
       this.operators.push(_operator2);
     }
     if (_operator3) {
       if (!(_operator3 instanceof Soldier)) {
-        throw new TypeError('A operator 3 unit must be type of Soldier');
+        throw new TypeError(Utils.ERR_NOT_SOLDIER);
       }
       this.operators.push(_operator3);
     }

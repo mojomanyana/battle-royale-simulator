@@ -1,19 +1,19 @@
-
 import RandomStrategy from './randomStrategy';
 import StrongestStrategy from './strongestStrategy';
 import WeakestStrategy from './weakestStrategy';
+import Utils from '../../../helpers/utils';
 
 export default class StrategyFactory {
   createStrategy = (type) => {
     switch (type) {
-      case 'random':
+      case Utils.RANDOM:
         return new RandomStrategy();
-      case 'strongest':
+      case Utils.STRONGEST:
         return new StrongestStrategy();
-      case 'weakest':
+      case Utils.WEAKEST:
         return new WeakestStrategy();
       default:
-        throw new TypeError('A strategy must be string type of value: "random", "weakest" or "strongest"');
+        throw new TypeError(Utils.ERR_INVALID_STRATEGY);
     }
   }
 }

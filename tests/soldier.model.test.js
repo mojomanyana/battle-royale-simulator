@@ -1,5 +1,6 @@
 import assert from 'assert';
 import Soldier from '../src/models/soldier';
+import Utils from '../helpers/utils';
 
 describe('Models - Soldier', () => {
   it('should cast error for invalid health input', (done) => {
@@ -7,7 +8,7 @@ describe('Models - Soldier', () => {
       const soldier = new Soldier(300, 200, 3);
       soldier.getHealth();
     } catch (error) {
-      assert(error.message === 'A unit health must be 0 - 100');
+      assert(error.message === Utils.ERR_HEALTH_RANGE);
       done();
     }
   });
@@ -17,7 +18,7 @@ describe('Models - Soldier', () => {
       const soldier = new Soldier(30, 20, 3);
       soldier.getRecharge();
     } catch (error) {
-      assert(error.message === 'A unit recharge must be 100 - 2000');
+      assert(error.message === Utils.ERR_RECHARGE_RANGE);
       done();
     }
   });
@@ -27,7 +28,7 @@ describe('Models - Soldier', () => {
       const soldier = new Soldier(30, 200, 300);
       soldier.getExperience();
     } catch (error) {
-      assert(error.message === 'A soldier expiriance must be 0 - 50');
+      assert(error.message === Utils.ERR_EXPIRIANCE_RANGE);
       done();
     }
   });

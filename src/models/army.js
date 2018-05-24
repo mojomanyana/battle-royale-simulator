@@ -5,15 +5,15 @@ import Utils from '../../helpers/utils';
 
 export default class Army {
   constructor(..._squads) {
-    assert(_squads, 'squads are reuqired for army');
-    assert(_squads.length > 1, 'number of squads should be more than 1 squad for every army');
+    assert(_squads, Utils.ERR_SQUADS_REQUIRED);
+    assert(_squads.length > 1, Utils.ERR_SQUADS_LENGTH);
 
     this.squads = [];
     _squads.forEach((squad) => {
       if (squad instanceof Squad) {
         this.squads.push(squad);
       } else {
-        throw new TypeError('A unit must be type of Squad');
+        throw new TypeError(Utils.ERR_NOT_SQUAD);
       }
     });
 

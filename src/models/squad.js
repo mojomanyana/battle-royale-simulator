@@ -7,17 +7,16 @@ import Utils from '../../helpers/utils';
 
 export default class Squad {
   constructor(_strategy, ..._units) {
-    assert(_strategy, 'strategy is reuqired for squad');
-    assert(_units, 'units are reuqired for squad');
-    assert(_units.length >= 5, 'number of units per squad must be more than or equal to 5');
-    assert(_units.length <= 10, 'number of units per squad must be less than or equal to 10');
+    assert(_strategy, Utils.ERR_STRATEGY_REQUIRED);
+    assert(_units, Utils.ERR_UNITS_REQUIRED);
+    assert(_units.length >= 5 && _units.length <= 10, Utils.ERR_UNITS_LENGTH);
 
     this.units = [];
     _units.forEach((unit) => {
       if (unit instanceof Unit) {
         this.units.push(unit);
       } else {
-        throw new TypeError('A unit must be type of Unit');
+        throw new TypeError(Utils.ERR_NOT_UNIT);
       }
     });
 
@@ -80,14 +79,12 @@ export default class Squad {
         return this.attack(foeSquads);
       }
       return this.stopAttackingFoes(resolve);
-    }, rechargesAvg);
+    }, rechargesAvg / 20);
   }
 
   stopAttackingFoes = (resolve) => {
     clearInterval(this.attackInterval);
-    if (this.isActive()) {
-      Utils.log(`${this.name} is still alive`, 'debug');
-    } else {
+    if (!this.isActive()) {
       Utils.log(`${this.name} is destroyed`, 'debug');
     }
     resolve();

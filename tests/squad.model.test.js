@@ -2,6 +2,7 @@ import assert from 'assert';
 import Soldier from '../src/models/soldier';
 import Vehicle from '../src/models/vehicle';
 import Squad from '../src/models/squad';
+import Utils from '../helpers/utils';
 
 const soldier1 = new Soldier(20, 200, 3);
 const soldier2 = new Soldier(30, 200, 6);
@@ -17,7 +18,7 @@ describe('Models - Squad', () => {
       const squad = new Squad('unknown', soldier1, soldier2, soldier3, vehicle1, vehicle2);
       squad.getHealth();
     } catch (error) {
-      assert(error.message === 'A strategy must be string type of value: "random", "weakest" or "strongest"');
+      assert(error.message === Utils.ERR_INVALID_STRATEGY);
       done();
     }
   });
@@ -36,7 +37,7 @@ describe('Models - Squad', () => {
       const squad = new Squad('random', soldier1, soldier2, soldier3, vehicle1, {});
       squad.getHealth();
     } catch (error) {
-      assert(error.message === 'A unit must be type of Unit');
+      assert(error.message === Utils.ERR_NOT_UNIT);
       done();
     }
   });

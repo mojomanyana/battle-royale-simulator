@@ -6,7 +6,7 @@ export default class Soldier extends Unit {
     super(_health, _recharge);
 
     if (_experience < 0 || _experience > 50) {
-      throw new TypeError('A soldier expiriance must be 0 - 50');
+      throw new TypeError(Utils.ERR_EXPIRIANCE_RANGE);
     }
 
     this.experience = _experience;
