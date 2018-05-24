@@ -84,9 +84,6 @@ export default class Squad {
 
   stopAttackingFoes = (resolve) => {
     clearInterval(this.attackInterval);
-    if (!this.isActive()) {
-      Utils.log(`${this.name} is destroyed`, 'debug');
-    }
     resolve();
   }
 
