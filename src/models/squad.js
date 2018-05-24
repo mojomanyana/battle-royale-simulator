@@ -79,7 +79,7 @@ export default class Squad {
         return this.attack(foeSquads);
       }
       return this.stopAttackingFoes(resolve);
-    }, rechargesAvg / 20);
+    }, rechargesAvg);
   }
 
   stopAttackingFoes = (resolve) => {

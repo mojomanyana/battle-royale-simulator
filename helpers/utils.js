@@ -32,8 +32,7 @@ const ERR_RECHARGEVEHICLE_RANGE = 'A vehicle recharge must be greater than 1000'
 export default class Utils {
   static log = (message, level = 'debug') => {
     if (!process.env.DISABLELOGS) {
-      // logger.log({ level, message });
-      console.log(message);
+      logger.log({ level, message });
     }
   }
 
