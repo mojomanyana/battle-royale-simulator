@@ -2,28 +2,26 @@ import assert from 'assert';
 import gmean from 'compute-gmean';
 import randomWord from 'random-word';
 import Unit from './base/unit';
-import Logger from './helpers/utils';
+import StrategyFactory from './strategy/strategyFactory';
+import Utils from '../../helpers/utils';
 
 export default class Squad {
   constructor(_strategy, ..._units) {
-    assert(_strategy);
-    assert(_units);
-    assert(_units.length >= 5);
-    assert(_units.length <= 10);
+    assert(_strategy, Utils.ERR_STRATEGY_REQUIRED);
+    assert(_units, Utils.ERR_UNITS_REQUIRED);
+    assert(_units.length >= 5 && _units.length <= 10, Utils.ERR_UNITS_LENGTH);
 
     this.units = [];
     _units.forEach((unit) => {
       if (unit instanceof Unit) {
         this.units.push(unit);
       } else {
-        throw new TypeError('A unit must be type of Unit');
+        throw new TypeError(Utils.ERR_NOT_UNIT);
       }
     });
 
-    if (_strategy !== 'random' && _strategy !== 'weakest' && _strategy !== 'strongest') {
-      throw new TypeError('A strategy must be string type of value: "random", "weakest" or "strongest"');
-    }
-    this.strategy = _strategy;
+    const factory = new StrategyFactory();
+    this.strategy = factory.createStrategy(_strategy);
     this.randomName = randomWord();
   }
 
@@ -32,7 +30,7 @@ export default class Squad {
       const activeUnits = this.units.filter(unit => unit.isActive());
       const opAttacks = activeUnits.map(unit => unit.getNewtAttackSuccessProbability());
       const prob = gmean(opAttacks);
-      // Logger.log(`${this.name} next attack success probability is ${prob}`);
+      Utils.log(`${this.name} next attack success probability is ${prob}`, 'debug');
       return prob;
     }
     return 0;
@@ -43,7 +41,7 @@ export default class Squad {
       const activeUnits = this.units.filter(unit => unit.isActive());
       const opDmg = activeUnits.map(unit => unit.getNextAttackDamage());
       const dmg = opDmg.reduce((a, b) => (a + b));
-      // Logger.log(`${this.name} next attack damage is ${dmg}`);
+      Utils.log(`${this.name} next attack damage is ${dmg}`, 'debug');
       return dmg;
     }
     return 0;
@@ -57,13 +55,10 @@ export default class Squad {
     });
   }
 
-  attack = (defSquad) => {
-    if (!(defSquad instanceof Squad)) {
-      throw new TypeError('A defending squad must be type of Squad');
-    }
-
-    if (this.isActive() && defSquad.isActive()) {
-      Logger.log(`${this.name} is attacking ${defSquad.name}`);
+  attack = (foeSquads) => {
+    const defSquad = this.strategy.getSquadToAttack(foeSquads);
+    if (this.isActive() && defSquad != null && defSquad.isActive()) {
+      Utils.log(`${this.name} is attacking ${defSquad.name}`, 'debug');
       const probAtt = this.getNewtAttackSuccessProbability();
       const probDef = defSquad.getNewtAttackSuccessProbability();
       if (probAtt > probDef) {
@@ -76,6 +71,25 @@ export default class Squad {
     }
   }
 
+  startAttackingFoes = (foeSquads, resolve) => {
+    const recharges = this.units.map(x => x.getRecharge());
+    const rechargesAvg = recharges.reduce((a, b) => a + b, 0) / this.units.length;
+    this.attackInterval = setInterval(() => {
+      if (this.isActive() && foeSquads.filter(x => x.isActive()).length > 0) {
+        return this.attack(foeSquads);
+      }
+      return this.stopAttackingFoes(resolve);
+    }, rechargesAvg);
+  }
+
+  stopAttackingFoes = (resolve) => {
+    clearInterval(this.attackInterval);
+    if (!this.isActive()) {
+      Utils.log(`${this.name} is destroyed`, 'debug');
+    }
+    resolve();
+  }
+
   isActive = () => (this.units.filter(unit => unit.isActive()).length > 0);
 
   getHealth = () => {
@@ -84,12 +98,17 @@ export default class Squad {
     return healtsSum;
   }
 
-  get name() {
-    if (this.isActive()) {
-      return `Squad(${this.randomName}) \x1b[39m{ units:${this.units.filter(x => x.isActive()).length} }`;
-    }
-    return `\x1b[31m\x1b[4mSquad(${this.randomName})\x1b[0m\x1b[39m { units:${this.units.filter(x => x.isActive()).length} }\x1b[0m\x1b[39m`;
+  getExpiriance = () => {
+    const expiriances = this.units.map(x => x.getExperience());
+    const hexpiriancesSum = expiriances.reduce((a, b) => a + b, 0);
+    return hexpiriancesSum;
   }
 
-  toString = (pref = '\n\x1b[35m-') => (`${pref}${this.name}${this.units.map(operator => (operator.toString()))}\x1b[39m`);
+  getUnitsNumber = () => (this.units.filter(x => x.isActive()).length);
+
+  get name() {
+    return `Squad(${this.randomName}) { units:${this.getUnitsNumber()} }`;
+  }
+
+  toString = (pref = '') => (`${pref}${this.name}${this.units.map(operator => (operator.toString('\n--')))}`);
 }

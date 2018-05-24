@@ -1,6 +1,7 @@
 import assert from 'assert';
 import Soldier from '../src/models/soldier';
 import Vehicle from '../src/models/vehicle';
+import Utils from '../helpers/utils';
 
 describe('Models - Vehicles', () => {
   it('should cast error for invalid health input', (done) => {
@@ -8,7 +9,7 @@ describe('Models - Vehicles', () => {
       const vehicle = new Vehicle(300, 200);
       vehicle.getHealth();
     } catch (error) {
-      assert(error.message === 'A unit health must be 0 - 100');
+      assert(error.message === Utils.ERR_HEALTH_RANGE);
       done();
     }
   });
@@ -18,7 +19,7 @@ describe('Models - Vehicles', () => {
       const vehicle = new Vehicle(30, 20);
       vehicle.getRecharge();
     } catch (error) {
-      assert(error.message === 'A unit recharge must be 100 - 2000');
+      assert(error.message === Utils.ERR_RECHARGE_RANGE);
       done();
     }
   });
@@ -29,7 +30,7 @@ describe('Models - Vehicles', () => {
       const vehicle = new Vehicle(30, 200, soldier);
       vehicle.getRecharge();
     } catch (error) {
-      assert(error.message === 'A vehicle recharge must be greater than 1000');
+      assert(error.message === Utils.ERR_RECHARGEVEHICLE_RANGE);
       done();
     }
   });
@@ -39,7 +40,7 @@ describe('Models - Vehicles', () => {
       const vehicle = new Vehicle(30, 200);
       vehicle.getTotalHealth();
     } catch (error) {
-      assert(error.message === 'At least 1 opperator is required');
+      assert(error.message === Utils.ERR_OPERATOR_REQUIRED);
       done();
     }
   });
@@ -50,7 +51,7 @@ describe('Models - Vehicles', () => {
       const vehicle = new Vehicle(30, 200, soldier1);
       vehicle.getTotalHealth();
     } catch (error) {
-      assert(error.message === 'A operator 1 unit must be type of Soldier');
+      assert(error.message === Utils.ERR_NOT_SOLDIER);
       done();
     }
   });

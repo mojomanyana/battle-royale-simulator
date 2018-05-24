@@ -1,17 +1,18 @@
 import randomWord from 'random-word';
+import Utils from '../../../helpers/utils';
 
 export default class Unit {
   constructor(_baseHealth, _recharge) {
     if (new.target === Unit) {
-      throw new TypeError('Cannot construct Unit instances directly');
+      throw new TypeError(Utils.ERR_ABSTRACT_INSTANCE);
     }
 
     if (_baseHealth < 0 || _baseHealth > 100) {
-      throw new TypeError('A unit health must be 0 - 100');
+      throw new RangeError(Utils.ERR_HEALTH_RANGE);
     }
 
     if (_recharge < 100 || _recharge > 2000) {
-      throw new TypeError('A unit recharge must be 100 - 2000');
+      throw new RangeError(Utils.ERR_RECHARGE_RANGE);
     }
 
     this.randomName = randomWord();

@@ -1,14 +1,12 @@
 import Unit from './base/unit';
-import Logger from './helpers/utils';
-
-const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+import Utils from '../../helpers/utils';
 
 export default class Soldier extends Unit {
   constructor(_health, _recharge, _experience) {
     super(_health, _recharge);
 
     if (_experience < 0 || _experience > 50) {
-      throw new TypeError('A soldier expiriance must be 0 - 50');
+      throw new TypeError(Utils.ERR_EXPIRIANCE_RANGE);
     }
 
     this.experience = _experience;
@@ -27,8 +25,8 @@ export default class Soldier extends Unit {
     if (this.isActive()) {
       const prob =
         0.5 * (1 + this.getHealth() / 100)
-        * rnd(30 + this.getExperience(), 100) / 100;
-      // Logger.log(`${this.name} next attack success probability is ${prob}`);
+        * Utils.rnd(30 + this.getExperience(), 100) / 100;
+      Utils.log(`${this.name} next attack success probability is ${prob}`);
       return prob;
     }
     return 0;
@@ -37,7 +35,7 @@ export default class Soldier extends Unit {
   getNextAttackDamage = () => {
     if (this.isActive()) {
       const dmg = 0.05 + this.getExperience() / 100;
-      // Logger.log(`${this.name} next attack damage is ${dmg}`);
+      Utils.log(`${this.name} next attack damage is ${dmg}`, 'debug');
       return dmg;
     }
     return 0;
@@ -51,12 +49,12 @@ export default class Soldier extends Unit {
 
   destroyUnit = () => {
     this.baseHealth = 0;
-    Logger.log(`${this.name} destroyd!`);
+    Utils.log(`Soldier(${this.randomName}) destroyd!`);
   }
 
   recieveDamage = (dmg) => {
     this.baseHealth -= dmg;
-    Logger.log(`${this.name} recieved damage ${dmg}!`);
+    Utils.log(`${this.name} recieved damage ${dmg}!`);
     if (!this.isActive()) {
       this.destroyUnit();
       return true;
@@ -67,11 +65,8 @@ export default class Soldier extends Unit {
   isActive = () => (this.getHealth() > 0);
 
   get name() {
-    if (this.isActive()) {
-      return `Soldier(${this.randomName})\x1b[39m { h:${this.getHealth()}, r:${this.getRecharge()}, exp:${this.getExperience()} }`;
-    }
-    return `\x1b[31m\x1b[4mSoldier(${this.randomName})\x1b[0m\x1b[39m { h:${this.getHealth()}, r:${this.getRecharge()}, exp:${this.getExperience()} }`;
+    return `Soldier(${this.randomName}) { h:${this.getHealth()}, r:${this.getRecharge()}, exp:${this.getExperience()} }`;
   }
 
-  toString = (pref = '\n\x1b[36m--') => (`${pref}${this.name}`);
+  toString = (pref = '') => (`${pref}${this.name}`);
 }
